@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { Flame, Plus, X, Droplet, BookOpen, Brain, Dumbbell, Heart, Coffee, Moon, Music } from 'lucide-react'
+import { Flame, Plus, X, Droplet, BookOpen, Brain, Dumbbell, Heart, Coffee, Moon, Music, Pencil, Check } from 'lucide-react'
 import Card, { CardHeader } from './Card'
 
 const iconMap = {
   droplet: Droplet, book: BookOpen, brain: Brain, dumbbell: Dumbbell,
   heart: Heart, coffee: Coffee, moon: Moon, music: Music, flame: Flame,
 }
+const iconNames = Object.keys(iconMap)
 
 function getStreak(habits, today) {
   let streak = 0
@@ -25,6 +26,9 @@ export default function HabitTracker({ habits, setHabits, today }) {
   const [newName, setNewName] = useState('')
   const [newIcon, setNewIcon] = useState('heart')
   const [newColor, setNewColor] = useState('var(--teal)')
+  const [editId, setEditId] = useState(null)
+  const [editName, setEditName] = useState('')
+  const [editColor, setEditColor] = useState('')
 
   const streak = getStreak(habits, today)
 
@@ -45,6 +49,13 @@ export default function HabitTracker({ habits, setHabits, today }) {
   }
 
   const removeHabit = id => setHabits(prev => prev.filter(h => h.id !== id))
+
+  const startEdit = (h) => { setEditId(h.id); setEditName(h.name); setEditColor(h.color) }
+  const saveEdit = () => {
+    if (!editName.trim()) return
+    setHabits(prev => prev.map(h => h.id === editId ? { ...h, name: editName.trim(), color: editColor } : h))
+    setEditId(null)
+  }
 
   const colors = ['var(--purple)', 'var(--teal)', 'var(--blue)', 'var(--coral)', 'var(--amber)']
 
@@ -74,18 +85,14 @@ export default function HabitTracker({ habits, setHabits, today }) {
 
       {showAdd && (
         <div style={{ marginBottom: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <input
-            value={newName}
-            onChange={e => setNewName(e.target.value)}
+          <input value={newName} onChange={e => setNewName(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && addHabit()}
-            placeholder="Neue Gewohnheit..."
-            autoFocus
+            placeholder="Neue Gewohnheit..." autoFocus
             style={{
               background: 'var(--bg-input)', border: '1px solid var(--border)',
               borderRadius: 'var(--radius-sm)', padding: '8px 12px', color: 'var(--text-primary)',
               fontSize: 13, outline: 'none',
-            }}
-          />
+            }} />
           <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
             <span style={{ fontSize: 11, color: 'var(--text-muted)', marginRight: 4 }}>Farbe:</span>
             {colors.map(c => (
@@ -107,6 +114,42 @@ export default function HabitTracker({ habits, setHabits, today }) {
         {habits.map(h => {
           const Icon = iconMap[h.icon] || Heart
           const done = h.history[today]
+
+          if (editId === h.id) {
+            return (
+              <div key={h.id} style={{
+                padding: '8px 10px', borderRadius: 'var(--radius-sm)',
+                background: 'var(--bg-input)', border: '1.5px solid var(--teal-dim)',
+                display: 'flex', flexDirection: 'column', gap: 6,
+              }}>
+                <input value={editName} onChange={e => setEditName(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && saveEdit()} autoFocus
+                  style={{
+                    background: 'transparent', border: 'none', color: 'var(--text-primary)',
+                    fontSize: 13, outline: 'none', padding: '2px 0',
+                  }} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  {colors.map(c => (
+                    <div key={c} onClick={() => setEditColor(c)} style={{
+                      width: 16, height: 16, borderRadius: '50%', background: c, cursor: 'pointer',
+                      border: editColor === c ? '2px solid #fff' : '2px solid transparent',
+                    }} />
+                  ))}
+                  <button onClick={saveEdit} style={{
+                    marginLeft: 'auto', background: 'var(--teal-dim)', border: 'none',
+                    borderRadius: 'var(--radius-sm)', width: 26, height: 26,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                  }}><Check size={12} color="#fff" /></button>
+                  <button onClick={() => setEditId(null)} style={{
+                    background: 'transparent', border: '1px solid var(--border)',
+                    borderRadius: 'var(--radius-sm)', width: 26, height: 26,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                  }}><X size={12} color="var(--text-secondary)" /></button>
+                </div>
+              </div>
+            )
+          }
+
           return (
             <div key={h.id} style={{
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -118,18 +161,18 @@ export default function HabitTracker({ habits, setHabits, today }) {
                 <Icon size={15} color={h.color} />
                 <span style={{ fontSize: 13 }}>{h.name}</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <X size={12} color="var(--text-muted)" style={{ cursor: 'pointer', opacity: 0.5 }} onClick={() => removeHabit(h.id)} />
-                <div
-                  onClick={() => toggleHabit(h.id)}
-                  style={{
-                    width: 22, height: 22, borderRadius: '50%', cursor: 'pointer',
-                    background: done ? h.color : 'transparent',
-                    border: done ? 'none' : '1.5px solid var(--text-muted)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    transition: 'all 0.2s',
-                  }}
-                >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <Pencil size={11} color="var(--text-muted)" style={{ cursor: 'pointer', opacity: 0.5 }}
+                  onClick={() => startEdit(h)} />
+                <X size={12} color="var(--text-muted)" style={{ cursor: 'pointer', opacity: 0.5 }}
+                  onClick={() => removeHabit(h.id)} />
+                <div onClick={() => toggleHabit(h.id)} style={{
+                  width: 22, height: 22, borderRadius: '50%', cursor: 'pointer',
+                  background: done ? h.color : 'transparent',
+                  border: done ? 'none' : '1.5px solid var(--text-muted)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  transition: 'all 0.2s',
+                }}>
                   {done && <span style={{ color: '#fff', fontSize: 12 }}>✓</span>}
                 </div>
               </div>

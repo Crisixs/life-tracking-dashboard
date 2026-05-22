@@ -11,6 +11,7 @@ import Notes from './components/Notes'
 import TrainingPlan from './components/TrainingPlan'
 import BudgetTracker from './components/BudgetTracker'
 import HistoryView from './components/HistoryView'
+import GermanComparison from './components/GermanComparison'
 
 const STORAGE_KEY = 'dashboard_data'
 
@@ -122,6 +123,9 @@ function App() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginTop: 14 }}>
             <Goals goals={data.goals} setGoals={v => update('goals', v)} />
             <Notes notes={data.notes} setNotes={v => update('notes', v)} />
+          </div>
+          <div style={{ marginTop: 14 }}>
+            <GermanComparison data={data} today={today} />
           </div>
         </>
       )}
