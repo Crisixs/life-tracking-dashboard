@@ -10,13 +10,15 @@ import Goals from './components/Goals'
 import Notes from './components/Notes'
 import TrainingPlan from './components/TrainingPlan'
 import BudgetTracker from './components/BudgetTracker'
+import { SparChallenge, AboManager, Wunschliste } from './components/BudgetExtended'
 import HistoryView from './components/HistoryView'
 import GermanComparison from './components/GermanComparison'
 import SmartHomePanel from './components/SmartHomePanel'
+import { WeatherWidget, SceneControl, AutomationLog, DEFAULT_SCENES } from './components/SmartHomeExtended'
 import CloudPanel from './components/CloudPanel'
+import SystemPanel from './components/SystemPanel'
 
 const STORAGE_KEY = 'dashboard_data'
-
 const WEEKDAYS = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag']
 
 const defaultData = {
@@ -41,14 +43,23 @@ const defaultData = {
   trainingPlan: Object.fromEntries(WEEKDAYS.map(d => [d, { exercises: [], isRest: false }])),
   trainingLog: {},
   budget: {
-    income: 0,
-    fixedExpenses: [],
-    transactions: [],
-    savingsGoal: 0,
-    debtTotal: 0,
-    debtPayments: [],
+    income: 0, fixedExpenses: [], transactions: [],
+    savingsGoal: 0, debtTotal: 0, debtPayments: [],
   },
+  sparChallenge: { mode: 'ascending', weeklyAmount: 1, weeks: Array(52).fill(false) },
+  abos: [
+    { id: 1, name: 'Netflix', amount: 12.99, cycle: 'monthly' },
+    { id: 2, name: 'Spotify', amount: 9.99, cycle: 'monthly' },
+    { id: 3, name: 'ChatGPT Plus', amount: 20, cycle: 'monthly' },
+    { id: 4, name: 'iCloud 200GB', amount: 2.99, cycle: 'monthly' },
+    { id: 5, name: 'Fitnessstudio', amount: 29.90, cycle: 'monthly' },
+  ],
+  wishes: [
+    { id: 1, name: 'NVMe SSD 512GB + M.2 HAT', price: 65, saved: 0, link: '' },
+    { id: 2, name: 'Zigbee USB-Stick', price: 15, saved: 0, link: '' },
+  ],
   sleepGoal: 8,
+  scenes: [...DEFAULT_SCENES],
   smarthome: {
     rooms: [
       { id: 1, name: 'Wohnzimmer', temp: 21.5, targetTemp: 22, humidity: 45, lights: [{ id: 1, name: 'Deckenlampe', on: true, brightness: 80 }, { id: 2, name: 'Stehlampe', on: false, brightness: 50 }] },
@@ -57,12 +68,11 @@ const defaultData = {
       { id: 4, name: 'Bad', temp: 23.0, targetTemp: 23, humidity: 65, lights: [{ id: 5, name: 'Spiegellampe', on: false, brightness: 100 }] },
     ],
     energy: {
-      stromDaily: [3.2, 4.1, 3.8, 3.5, 4.3, 3.9, 3.6, 4.0, 3.7, 3.3, 4.2, 3.8, 3.4, 3.9, 4.1, 3.6, 3.5, 4.0, 3.8, 3.7, 3.4, 3.9, 4.1, 3.6, 3.3, 4.2, 3.8, 3.5, 3.7, 3.9],
-      gasDaily: [2.1, 2.5, 2.3, 1.9, 2.6, 2.2, 2.0, 2.4, 2.1, 1.8, 2.5, 2.3, 2.0, 2.4, 2.6, 2.1, 2.0, 2.3, 2.2, 2.1, 1.9, 2.4, 2.5, 2.0, 1.8, 2.6, 2.3, 2.1, 2.2, 2.4],
-      stromMonthly: [98, 105, 95, 88, 92, 85, 82, 88, 95, 102, 110, 108],
-      gasMonthly: [120, 115, 85, 55, 30, 15, 10, 12, 25, 60, 95, 118],
-      stromPrice: 0.35,
-      gasPrice: 0.12,
+      stromDaily: [3.2,4.1,3.8,3.5,4.3,3.9,3.6,4.0,3.7,3.3,4.2,3.8,3.4,3.9,4.1,3.6,3.5,4.0,3.8,3.7,3.4,3.9,4.1,3.6,3.3,4.2,3.8,3.5,3.7,3.9],
+      gasDaily: [2.1,2.5,2.3,1.9,2.6,2.2,2.0,2.4,2.1,1.8,2.5,2.3,2.0,2.4,2.6,2.1,2.0,2.3,2.2,2.1,1.9,2.4,2.5,2.0,1.8,2.6,2.3,2.1,2.2,2.4],
+      stromMonthly: [98,105,95,88,92,85,82,88,95,102,110,108],
+      gasMonthly: [120,115,85,55,30,15,10,12,25,60,95,118],
+      stromPrice: 0.35, gasPrice: 0.12,
       devices: [
         { id: 1, name: 'PC & Monitor', watts: 350, hoursPerDay: 6 },
         { id: 2, name: 'Kühlschrank', watts: 100, hoursPerDay: 24 },
@@ -72,8 +82,7 @@ const defaultData = {
     },
   },
   cloud: {
-    totalGB: 4000,
-    usedGB: 856,
+    totalGB: 4000, usedGB: 856,
     folders: [
       { name: 'Dokumente', sizeGB: 124, color: 'var(--purple)' },
       { name: 'Fotos', sizeGB: 380, color: 'var(--blue)' },
@@ -100,11 +109,8 @@ const defaultData = {
 function loadData() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved) {
-      const parsed = JSON.parse(saved)
-      return { ...defaultData, ...parsed }
-    }
-  } catch (e) { /* ignore */ }
+    if (saved) { return { ...defaultData, ...JSON.parse(saved) } }
+  } catch (e) {}
   return defaultData
 }
 
@@ -112,9 +118,7 @@ function App() {
   const [data, setData] = useState(loadData)
   const [activeTab, setActiveTab] = useState('dashboard')
 
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
-  }, [data])
+  useEffect(() => { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)) }, [data])
 
   const update = (key, value) => {
     setData(prev => ({ ...prev, [key]: typeof value === 'function' ? value(prev[key]) : value }))
@@ -128,6 +132,7 @@ function App() {
     { id: 'budget', label: 'Budget', icon: '◈' },
     { id: 'smarthome', label: 'Smart Home', icon: '◆' },
     { id: 'cloud', label: 'Cloud', icon: '◇' },
+    { id: 'system', label: 'System', icon: '⬡' },
     { id: 'history', label: 'Verlauf', icon: '◷' },
   ]
 
@@ -141,20 +146,15 @@ function App() {
         padding: 4, border: '1px solid var(--border)', overflowX: 'auto',
       }}>
         {tabs.map(tab => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            style={{
-              flex: 1, padding: '10px 4px', borderRadius: 'var(--radius-sm)',
-              border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 500,
-              fontFamily: 'var(--font-main)', whiteSpace: 'nowrap', minWidth: 0,
-              background: activeTab === tab.id ? 'var(--purple-dim)' : 'transparent',
-              color: activeTab === tab.id ? '#fff' : 'var(--text-secondary)',
-              transition: 'all 0.2s',
-            }}
-          >
-            <span style={{ marginRight: 4 }}>{tab.icon}</span>
-            {tab.label}
+          <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{
+            flex: 1, padding: '10px 2px', borderRadius: 'var(--radius-sm)',
+            border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 500,
+            fontFamily: 'var(--font-main)', whiteSpace: 'nowrap', minWidth: 0,
+            background: activeTab === tab.id ? 'var(--purple-dim)' : 'transparent',
+            color: activeTab === tab.id ? '#fff' : 'var(--text-secondary)',
+            transition: 'all 0.2s',
+          }}>
+            <span style={{ marginRight: 3 }}>{tab.icon}</span>{tab.label}
           </button>
         ))}
       </div>
@@ -186,20 +186,36 @@ function App() {
       )}
 
       {activeTab === 'budget' && (
-        <BudgetTracker budget={data.budget} setBudget={v => update('budget', v)} />
+        <>
+          <BudgetTracker budget={data.budget} setBudget={v => update('budget', v)} />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginTop: 14 }}>
+            <AboManager abos={data.abos} setAbos={v => update('abos', v)} />
+            <Wunschliste wishes={data.wishes} setWishes={v => update('wishes', v)} />
+          </div>
+          <div style={{ marginTop: 14 }}>
+            <SparChallenge challenge={data.sparChallenge} setChallenge={v => update('sparChallenge', v)} />
+          </div>
+        </>
       )}
 
       {activeTab === 'smarthome' && (
-        <SmartHomePanel smarthome={data.smarthome} setSmarthome={v => update('smarthome', v)} />
+        <>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
+            <WeatherWidget />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <SceneControl scenes={data.scenes} setScenes={v => update('scenes', v)} />
+              <AutomationLog />
+            </div>
+          </div>
+          <SmartHomePanel smarthome={data.smarthome} setSmarthome={v => update('smarthome', v)} />
+        </>
       )}
 
-      {activeTab === 'cloud' && (
-        <CloudPanel cloud={data.cloud} />
-      )}
+      {activeTab === 'cloud' && <CloudPanel cloud={data.cloud} />}
 
-      {activeTab === 'history' && (
-        <HistoryView data={data} />
-      )}
+      {activeTab === 'system' && <SystemPanel />}
+
+      {activeTab === 'history' && <HistoryView data={data} />}
     </div>
   )
 }

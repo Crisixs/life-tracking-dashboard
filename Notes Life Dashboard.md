@@ -16,3 +16,6 @@ Mehrere Geräte? Wenn der Pi läuft, ist das Dashboard eine Web-App im lokalen N
 
 Was wenn der Pi kaputt geht? Dafür richten wir automatische Backups ein. Die Datenbank liegt auf der 4 TB HDD, und wir machen regelmäßige Backup-Dumps (z.B. täglich). Wenn der Pi stirbt, kaufst du einen neuen, steckst die HDD ran, installierst das System neu von der SD-Karte, und stellst das Backup wieder her. Alles da. 4 TB reicht dafür locker – die Datenbank wird selbst nach Jahren nur ein paar GB groß.
 
+
+**Wie sieht es mit Sicherheit (Github, Credentials Leak) aus ?**#
+
