@@ -143,8 +143,10 @@ Write-Ok "Commit und Tag v$Version erstellt"
 
 # --- Push ---
 Write-Step "Push zu GitHub..."
-git push origin main 2>$null
-git push origin "v$Version" 2>$null
+$ErrorActionPreference = "SilentlyContinue"
+git push origin main 2>&1 | Out-Null
+git push origin "v$Version" 2>&1 | Out-Null
+$ErrorActionPreference = "Stop"
 Write-Ok "Code und Tag gepusht"
 
 # --- GitHub Release ---

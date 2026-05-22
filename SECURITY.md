@@ -1,59 +1,85 @@
-# 🔒 Sicherheits-Checkliste
+# Security Policy
 
-## Aktueller Status: ✅ Sicher
-Das Projekt speichert aktuell alles im Browser (localStorage) – **kein Backend, keine Secrets, keine API-Keys im Code**. Du kannst es bedenkenlos auf GitHub pushen.
+## Current Status: Safe
+
+The project currently stores all data in the browser (localStorage). There is no backend, no API keys, no secrets, and no credentials in the source code. It is safe to push to GitHub as-is.
 
 ---
 
-## Was NICHT in Git gehört (via .gitignore geschützt)
+## Files That Must Never Be Committed
 
-| Datei/Ordner | Warum |
+| File / Directory | Reason |
 |---|---|
-| `.env` | Enthält Passwörter, API-Keys, Datenbank-Credentials |
-| `*.pem`, `*.key` | SSL-Zertifikate und Private Keys |
-| `secrets/` | Ordner für sensible Konfiguration |
-| `node_modules/` | Dependencies – werden via `npm install` neu heruntergeladen |
+| `.env` | Contains passwords, API keys, database credentials |
+| `*.pem`, `*.key`, `*.cert` | SSL certificates and private keys |
+| `secrets/` | Directory for sensitive configuration files |
+| `credentials/` | Directory for credential files |
+| `node_modules/` | Dependencies, reinstalled via `npm install` |
 
-## Vor jedem Push prüfen
+All of the above are listed in `.gitignore` and will not be tracked by Git.
 
-1. **Kein `.env` im Repo?** → `git status` zeigt es dir
-2. **Keine hardcodierten Passwörter?** → Suche in VS Code nach `password`, `token`, `secret`, `key`
-3. **`.env.example` aktuell?** → Neue Variablen dort eintragen (ohne echte Werte!)
+---
 
-## Wenn du versehentlich ein Secret gepusht hast
+## Pre-Push Checklist
+
+1. Run `git status` to verify no `.env` or key files are staged
+2. Search the codebase for hardcoded strings: `password`, `token`, `secret`, `api_key`
+3. Keep `.env.example` updated with any new environment variables (without real values)
+4. The release script (`release.ps1`) runs an automated secret scan before every build
+
+---
+
+## If You Accidentally Push a Secret
+
+Remove the file from Git history immediately:
 
 ```bash
-# Datei aus Git-History entfernen (Achtung: ändert die History!)
 git filter-branch --force --index-filter \
   "git rm --cached --ignore-unmatch .env" \
   --prune-empty --tag-name-filter cat -- --all
-
-# Oder einfacher mit BFG Repo-Cleaner:
-# https://rtyley.github.io/bfg-repo-cleaner/
-
-# DANACH: Alle Passwörter/Keys sofort ändern!
 ```
 
-## Später mit Pi: Sicherheits-Setup
+Alternatively, use BFG Repo-Cleaner (faster for large repos):
+https://rtyley.github.io/bfg-repo-cleaner/
 
-Wenn der Pi mit Backend läuft, kommen diese Maßnahmen dazu:
+After removing the file from history, rotate all affected passwords and API keys immediately.
 
-### Umgebungsvariablen
-- Alle Secrets in `.env` (nie committen!)
-- `.env.example` als Vorlage mitliefern
-- Im Code: `process.env.DB_PASSWORD` statt hardcodiert
+---
 
-### Netzwerk
-- Dashboard nur im lokalen Netzwerk erreichbar
-- Firewall auf dem Pi konfigurieren (ufw)
-- HTTPS mit selbstsigniertem Zertifikat für lokales Netz
+## Future Security Measures (Raspberry Pi Deployment)
 
-### Datenbank
-- Eigener DB-User mit eingeschränkten Rechten
-- Starkes Passwort (zufällig generiert)
-- Backups auf der HDD (verschlüsselt mit GPG)
+### Environment Variables
 
-### Updates
-- Regelmäßig `sudo apt update && sudo apt upgrade`
-- Node.js Dependencies: `npm audit`
-- Pi-hole und Home Assistant automatisch updaten
+- All secrets stored in `.env` (never committed)
+- `.env.example` serves as a template
+- Application code references `process.env.DB_PASSWORD`, never hardcoded values
+
+### Network
+
+- Dashboard accessible only within the local network
+- Firewall configured on the Pi using `ufw`
+- HTTPS with self-signed certificate for local network traffic
+
+### Database
+
+- Dedicated database user with restricted permissions
+- Strong randomly generated password
+- Encrypted backups on the HDD using GPG
+
+### System Updates
+
+- Regular OS updates: `sudo apt update && sudo apt upgrade`
+- Dependency auditing: `npm audit`
+- Pi-hole and Home Assistant kept up to date
+
+### Backup Strategy
+
+- Daily automated database dumps to the 4TB HDD
+- If the Pi fails: new Pi, same HDD, restore from backup
+- Backup scripts will be added to the repository (without credentials)
+
+---
+
+## Reporting Vulnerabilities
+
+This is a private project. If you discover a security issue, contact the repository owner directly.
