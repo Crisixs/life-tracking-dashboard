@@ -18,6 +18,9 @@ import { WeatherWidget, SceneControl, AutomationLog, DEFAULT_SCENES } from './co
 import CloudPanel from './components/CloudPanel'
 import SystemPanel from './components/SystemPanel'
 import RewardSystem from './components/RewardSystem'
+import Countdowns from './components/Countdowns'
+import WeeklyReflection from './components/WeeklyReflection'
+import SettingsPanel from './components/SettingsPanel'
 
 const STORAGE_KEY = 'dashboard_data'
 const WEEKDAYS = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag']
@@ -115,6 +118,10 @@ const defaultData = {
     ],
     redeemed: [],
   },
+  countdowns: [
+    { id: 1, name: 'Raspberry Pi Setup', date: '2026-05-22', category: 'deadline' },
+  ],
+  reflections: {},
 }
 
 function loadData() {
@@ -142,10 +149,12 @@ function App() {
     { id: 'training', label: 'Training', icon: '◎' },
     { id: 'budget', label: 'Budget', icon: '◈' },
     { id: 'rewards', label: 'Rewards', icon: '★' },
+    { id: 'reflection', label: 'Reflexion', icon: '◍' },
     { id: 'smarthome', label: 'Smart Home', icon: '◆' },
     { id: 'cloud', label: 'Cloud', icon: '◇' },
     { id: 'system', label: 'System', icon: '⬡' },
     { id: 'history', label: 'Verlauf', icon: '◷' },
+    { id: 'settings', label: 'Settings', icon: '◎' },
   ]
 
   return (
@@ -184,10 +193,13 @@ function App() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginTop: 14 }}>
             <Goals goals={data.goals} setGoals={v => update('goals', v)} />
-            <Notes notes={data.notes} setNotes={v => update('notes', v)} />
+            <Countdowns countdowns={data.countdowns} setCountdowns={v => update('countdowns', v)} />
           </div>
-          <div style={{ marginTop: 14 }}>
-            <GermanComparison data={data} today={today} />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginTop: 14 }}>
+            <Notes notes={data.notes} setNotes={v => update('notes', v)} />
+            <div style={{ marginTop: 0 }}>
+              <GermanComparison data={data} today={today} />
+            </div>
           </div>
         </>
       )}
@@ -232,6 +244,14 @@ function App() {
       {activeTab === 'system' && <SystemPanel />}
 
       {activeTab === 'history' && <HistoryView data={data} />}
+
+      {activeTab === 'reflection' && (
+        <WeeklyReflection reflections={data.reflections} setReflections={v => update('reflections', v)} data={data} today={today} />
+      )}
+
+      {activeTab === 'settings' && (
+        <SettingsPanel data={data} setData={setData} />
+      )}
     </div>
   )
 }

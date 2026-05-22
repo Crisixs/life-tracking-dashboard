@@ -1,6 +1,6 @@
 # Life Tracking Dashboard
 
-Ein persoenliches All-in-One Dashboard zum Tracken von Gewohnheiten, Fitness, Schlaf, Finanzen, Smart Home und mehr. Gebaut mit React + Vite, designed fuer den Betrieb auf einem Raspberry Pi 5.
+A personal all-in-one dashboard for tracking habits, fitness, sleep, finances, smart home, and more. Built with React + Vite, designed to run on a Raspberry Pi 5.
 
 ## Quick Start
 
@@ -9,7 +9,7 @@ npm install
 npm run dev
 ```
 
-Oeffne http://localhost:5173 im Browser.
+Open http://localhost:5173 in your browser.
 
 ### Production Build
 
@@ -17,178 +17,258 @@ Oeffne http://localhost:5173 im Browser.
 npm run build
 ```
 
-### Release erstellen
+### Create a Release
 
 ```powershell
-.\release.ps1 -Version "1.5.0" -Message "Beschreibung"
+.\release.ps1 -Version "1.5.0" -Message "Description"
 ```
 
 ---
 
 ## Features
 
-### Dashboard (Hauptseite)
+### Dashboard (Main Page)
 
-Die zentrale Uebersicht mit allen wichtigen Tages-Metriken auf einen Blick.
+Central overview of all daily metrics at a glance.
 
-**Stats-Leiste** zeigt Aufgaben, Habits, Schlaf und Workout fuer heute.
+**Stats Bar** displays tasks (done/total), habits (done/total), sleep (hours), and workout (minutes) for today.
 
-**To-Do Liste** mit drei Prioritaetsstufen (Hoch, Mittel, Niedrig), farbcodierten Labels, Inline-Bearbeitung ueber das Stift-Icon, und Loeschen.
+**To-Do List** with three priority levels (High, Medium, Low). Color-coded labels, check-off functionality, inline editing via the pencil icon, and deletion. Completed tasks are greyed out and sorted to the bottom.
 
-**Gewohnheits-Tracker** mit taeglichen Habits, farbigen Icons, Streak-Zaehler und Flammen-Anzeige. Neue Habits mit Custom-Farbe hinzufuegen, bearbeiten oder loeschen.
+**Habit Tracker** with daily habits, colored icons, streak counter (consecutive days where ALL habits were completed), and a flame indicator. Add new habits with custom colors, edit or delete existing ones.
 
-**Workout-Tracker** zum Loggen von Uebungen mit Sets, Reps und Gewicht. Zeigt den Trainingsplan, rueckwirkend eintragbar fuer 7 Tage.
+**Workout Tracker** for logging exercises with sets, reps, and weight. Displays today's training plan from the Training tab. Backfill entries for the past 7 days. "Check off" button when the planned training day is complete.
 
-**Schlaf-Tracker** mit Einschlaf-/Aufwachzeit, Qualitaetsbewertung, Vergleich mit konfiguriertem Schlafziel (7-9h empfohlen), und Regenerations-Tipps.
+**Sleep Tracker** with bedtime/wake time input and quality rating (Great/Good/Okay/Bad). Comparison against a configurable sleep goal (default 8h, recommended 7-9h). Shows percentage of goal, deviation in hours, and a recovery tip. Backfill for 7 days.
 
-**Ziele** mit Fortschrittsbalken 0-100%, **Notizen** fuer schnelle Gedanken (Ctrl+Enter).
+**Goals** with progress bars (0-100%) and inline editing. **Notes** for quick thoughts (Ctrl+Enter to save), editable and deletable.
 
-**Deutschland-Vergleich** mit 7-Tage-Durchschnitt vs. deutschem Durchschnitt (Statistisches Bundesamt, DKV-Report 2025). Achievement-Badges wie "Sportlicher als 54% der Deutschen".
+**Germany Comparison** showing your 7-day average vs. the German national average (Federal Statistical Office 2022, DKV Report 2025). Comparison bars for sleep, workout days, workout minutes, and habit consistency. Achievement badges like "More athletic than 54% of Germans" or "Top 15% Fitness".
 
 ---
 
 ### Training
 
-Wochenbasierter Trainingsplan. Fuer jeden Wochentag Uebungen mit Sets/Reps/Gewicht hinterlegen. Wochenuebersicht mit Emoji-Status. Ruhetage markierbar. Nachtraegliches Eintragen moeglich.
+Week-based training plan with daily views.
+
+**Weekly Overview** with a 7-day grid showing emoji status (completed, rest day, planned, missed). Progress indicator (X/Y workouts completed).
+
+**Day Plans** for each weekday with exercises including sets/reps/weight. Days can be marked as rest days. Expandable cards with full details.
+
+**Retroactive Logging** allows marking missed training days as completed after the fact. Flexible for schedule changes.
 
 ---
 
 ### Budget
 
-**Transaktionen** mit Kategorien (Essen, Transport, Freizeit, Shopping, Gesundheit, Rechnungen). **Fixkosten** separat verwalten. **Graphen** fuer Einnahmen vs. Ausgaben, Vermoegensaufbau, Kategorie-Donut. **Schuldenabbau** mit Fortschrittsbalken.
+Complete financial management with visualizations.
 
-**52-Wochen Spar-Challenge** mit visuellem Grid. Modi: Aufsteigend, Fix, Zufaellig.
+**Transactions** for income and expenses with categories (Food, Transport, Entertainment, Shopping, Health, Bills, Other). Date picker for retroactive entries.
 
-**Abo-Manager** fuer alle laufenden Abos mit Gesamtkosten pro Monat/Jahr.
+**Fixed Expenses** for recurring monthly costs (rent, insurance, etc.) managed separately.
 
-**Wunschliste** mit Spar-Fortschritt pro Item.
+**Income vs. Expenses** bar chart over 6 months. **Net Worth Growth** area chart of cumulative savings. **Category Breakdown** donut chart of expenses by category. **Debt Payoff** tracker with progress bar.
+
+**52-Week Savings Challenge** with a visual grid of 52 weeks to check off. Three modes: Ascending (1/2/3...52 EUR), Fixed amount per week, or Random (1-50 EUR). Displays total saved and progress percentage.
+
+**Subscription Manager** for all active subscriptions (Netflix, Spotify, etc.). Monthly, quarterly, or yearly billing cycles. Shows total cost per month and year.
+
+**Wishlist** with savings progress per item tracked via slider and percentage display.
 
 ---
 
-### Rewards (Belohnungssystem)
+### Rewards (Gamification System)
 
-Gamification das gutes Verhalten belohnt und schlechtes bestraft.
+Coin-based system that rewards positive behavior and penalizes negative behavior.
 
-#### Coins verdienen
+#### Earning Coins
 
-| Aktion | Coins |
+| Action | Coins |
 |---|---|
-| To-Do erledigt | +10 |
-| To-Do hohe Prioritaet | +20 |
-| Gewohnheit erfuellt | +15 |
-| Alle Habits an einem Tag | +50 Bonus |
-| Workout absolviert | +30 |
-| Schlafziel erreicht | +20 |
-| 3-Tage Streak | +50 |
-| 7-Tage Streak | +150 |
-| 14-Tage Streak | +350 |
-| 30-Tage Streak | +1000 |
+| To-Do completed | +10 |
+| To-Do (high priority) | +20 |
+| Habit completed | +15 |
+| All habits in one day | +50 bonus |
+| Workout completed | +30 |
+| Sleep goal reached | +20 |
+| 3-day habit streak | +50 |
+| 7-day habit streak | +150 |
+| 14-day habit streak | +350 |
+| 30-day habit streak | +1000 |
 
-#### Strafen (automatisch berechnet)
+#### Penalties (Automatically Calculated)
 
-| Vergehen | Strafe |
+| Offense | Penalty |
 |---|---|
-| Habit nicht erfuellt | -10 pro Habit |
-| Kein einziger Habit am Tag | -30 |
-| Streak gebrochen (war 3+ Tage) | -50 |
-| Streak gebrochen (war 7+ Tage) | -150 |
-| Ganze Woche kein Workout | -40 |
-| Schlaf unter 5 Stunden | -15 |
-| Rueckfall (manuell gemeldet) | -50 bis -500 |
+| Missed habit | -10 per habit |
+| Zero habits completed in a day | -30 |
+| Streak broken (was 3+ days) | -50 |
+| Streak broken (was 7+ days) | -150 |
+| No workout for an entire week | -40 |
+| Sleep under 5 hours | -15 |
+| Relapse (manually reported) | -50 to -500 |
 
-Das Strafsystem ist fair designed: Verpasste Habits kosten Coins, aber weniger als man durch Erfuellung verdient. So bleibt das System motivierend statt frustrierend. Ein perfekter Tag bringt deutlich mehr ein als ein schlechter Tag kostet.
+The penalty system is designed to be fair: a good day earns significantly more than a bad day costs. This keeps the system motivating rather than frustrating.
 
-#### Rueckfall-System
+#### Relapse Reporting
 
-Ehrlich melden statt verstecken. Button zum manuellen Eintragen mit optionaler Notiz und selbst gewaehlter Strafe (50-500 Coins). Die Notiz ist nur fuer dich zur Reflexion. Das System bestraft nicht das Melden, sondern motiviert weiterzumachen.
+Honesty over hiding. A dedicated button allows manual relapse reporting with an optional private note for self-reflection and a self-chosen penalty (50-500 coins). The system does not punish reporting itself but motivates continued effort.
 
-#### Rang-System
+#### Rank System
 
-| Netto-Coins | Rang |
+| Net Coins | Rank |
 |---|---|
-| 0+ | Neuling |
-| 100+ | Anfaenger |
-| 500+ | Aufsteiger |
-| 1500+ | Fortgeschritten |
-| 3000+ | Profi |
+| 0+ | Newcomer |
+| 100+ | Beginner |
+| 500+ | Rising |
+| 1500+ | Intermediate |
+| 3000+ | Pro |
 | 5000+ | Elite |
-| 10000+ | Legende |
+| 10000+ | Legend |
 
-**Belohnungen** selbst definieren mit Emoji, Name und Coin-Preis. Einloesen wenn genug Coins da sind.
-
----
-
-### Smart Home (Prototyp)
-
-**Raumsteuerung** mit Temperatur, Luftfeuchtigkeit, Thermostat und Lichtsteuerung pro Raum.
-
-**Wetter-Widget** mit 7-Tage-Vorhersage und Heizungs-Tipps.
-
-**Szenen** wie Guten Morgen, Filmabend, Gute Nacht die mehrere Geraete gleichzeitig steuern.
-
-**Automatisierungs-Log** zeigt was Home Assistant automatisch gemacht hat.
-
-**Energieverbrauch** mit Strom/Gas-Graphen, Kostenvergleich und Geraeteverbrauch.
+**Rewards** are user-defined with emoji, name, and coin cost. Redeemable when sufficient coins are available.
 
 ---
 
-### Cloud (Prototyp)
+### Smart Home (Prototype)
 
-**Speicher-Ring** mit Belegung, Aufschluesselung nach Ordner, verbundene Geraete mit Sync-Status, zuletzt synchronisierte Dateien, Server-Info.
+Central control for all smart devices in the house.
+
+**Room Controls** with current temperature, humidity, thermostat control (target temperature), and light switches with brightness sliders per room.
+
+**Weather Widget** with current conditions for Regensburg, 7-day forecast, and heating recommendations based on the weather outlook.
+
+**Scenes** like Good Morning, Movie Night, Good Night, and Away that control multiple devices simultaneously. Custom scenes can be created.
+
+**Automation Log** showing what Home Assistant has done automatically today (schedules, motion sensors, geofence triggers, etc.).
+
+**Energy Consumption** with electricity and gas usage as daily and monthly graphs. Average reference lines. Monthly energy costs as a bar chart.
+
+**Device Consumption** showing estimated power usage per device (watts, hours/day, kWh/day, EUR/month).
+
+Currently showing demo data. Will be connected to Home Assistant API once the Pi is running.
 
 ---
 
-### System (Prototyp)
+### Cloud (Prototype)
 
-**Pi System-Monitor** mit CPU, RAM, Temperatur Gauges. **CPU/Temperatur-Verlauf** als Live-Graphen. **Uptime-Tracker**. **Netzwerk-Monitor** mit allen WLAN-Geraeten. **Pi-hole Stats** mit Blockrate, stuendlichen Anfragen und Top geblockte Domains.
+Nextcloud dashboard for the personal 4TB cloud.
+
+**Storage Overview** with a ring diagram showing usage percentage. Breakdown by folder (Documents, Photos, Videos, Music, Backups) with colored bars.
+
+**Connected Devices** with online/offline status and last sync time for all synchronized devices.
+
+**Recently Synced** files with type icons, file size, and date.
+
+**Upload/Download Stats** for daily data transfer. **Server Info** showing Raspberry Pi 5, Seagate 4TB HDD, Nextcloud version.
+
+Currently showing demo data. Will be connected to Nextcloud API once the Pi is running.
 
 ---
 
-### Verlauf
+### System (Prototype)
 
-**Tag/Woche/Monat** umschaltbar mit Navigation. Schlaf-Chart mit Ziellinie, Workout-Balken, Habit-Prozent. Klickbare Tage-Grids. Monatskalender mit farbigen Aktivitaets-Dots.
+Live monitoring of the Raspberry Pi.
+
+**System Gauges** showing half-circle gauges for CPU, RAM, temperature, and disk usage. Color changes at high load thresholds.
+
+**CPU History** as a 60-second area chart. **Temperature History** as a 24-hour chart.
+
+**Uptime Tracker** with a large display of continuous runtime (days, hours, minutes).
+
+**System Info** showing hostname, kernel, local IP address, and dashboard URL.
+
+**Network Monitor** listing all devices on the local network with name, IP, MAC address, and online status. Toggle between online-only and all devices.
+
+**Pi-hole Statistics** with total queries, blocked queries, block rate percentage, and domains on the blocklist. Stacked bar chart of hourly queries (allowed vs. blocked). Top 5 blocked domains.
+
+Currently showing demo data. Will be connected to Pi system APIs and Pi-hole REST API once the Pi is running.
 
 ---
 
-## Technologie
+### History
 
-| Komponente | Technologie |
+Historical data view with charts.
+
+**Day/Week/Month** switchable time ranges with forward/backward navigation.
+
+**Day View** showing detailed breakdown of a single day (sleep, workout, habits).
+
+**Week View** with sleep as an area chart including a goal reference line, workout duration as bars, and habit completion percentage. Clickable day grid.
+
+**Month View** with a calendar grid (Mon-Sun) featuring colored activity dots (sleep, workout, habits). Clicking a day opens the detail view.
+
+**Summary Stats** with average sleep, workout count, and average habit completion per time range.
+
+---
+
+## Technology
+
+| Component | Technology |
 |---|---|
 | Frontend | React 19 + Vite |
 | Charts | Recharts |
 | Icons | Lucide React |
 | Fonts | Space Grotesk, JetBrains Mono |
-| Speicherung | localStorage (spaeter DB) |
-| Design | Dark Mode, CSS Custom Properties |
+| Storage | localStorage (database planned) |
+| Design | Dark mode, CSS custom properties |
 
-## Geplant (Raspberry Pi)
+## Planned (Raspberry Pi Deployment)
 
-- Node.js + Express Backend
-- PostgreSQL/SQLite auf 4TB HDD
-- Home Assistant API (Live Smart Home Daten)
-- Nextcloud API (Live Cloud Daten)
-- Pi System-Monitoring (/proc, vcgencmd)
-- Pi-hole REST-API
-- Automatische Backups (HDD)
-- Netzwerk-Zugriff von allen Geraeten
-- Responsive Design fuer Mobile
+- Node.js + Express backend
+- PostgreSQL or SQLite database on 4TB HDD
+- Home Assistant API integration (live smart home data)
+- Nextcloud API integration (live cloud data)
+- Pi system monitoring via /proc and vcgencmd
+- Pi-hole REST API integration
+- Automated backups to HDD
+- Network access from all devices
+- Responsive design for mobile
 
-## Sicherheit
+## Security
 
-Siehe [SECURITY.md](SECURITY.md) fuer Details. Keine Secrets im Code, .env fuer Credentials, Release-Script prueft automatisch.
+See [SECURITY.md](SECURITY.md) for the full security policy. No secrets in code, credentials via .env files, release script includes automated secret scanning.
 
-## Versionen
+## Project Structure
 
-| Version | Features |
+```
+src/
+  App.jsx                  Main app with tab navigation
+  index.css                Global styles and CSS variables
+  components/
+    Header.jsx             Greeting and date display
+    StatsRow.jsx           Daily statistics
+    TodoList.jsx           To-do list with priorities
+    HabitTracker.jsx       Habit tracker with streaks
+    WorkoutTracker.jsx     Workout logger
+    SleepTracker.jsx       Sleep tracker with goal comparison
+    Goals.jsx              Goals with progress bars
+    Notes.jsx              Quick notes
+    Card.jsx               Reusable card component
+    TrainingPlan.jsx       Weekly training plan
+    BudgetTracker.jsx      Finance tracker with charts
+    BudgetExtended.jsx     Savings challenge, subscriptions, wishlist
+    RewardSystem.jsx       Coin system with rewards and penalties
+    SmartHomePanel.jsx     Room and energy controls
+    SmartHomeExtended.jsx  Weather, scenes, automation log
+    CloudPanel.jsx         Nextcloud dashboard
+    SystemPanel.jsx        Pi system monitor, network, Pi-hole
+    HistoryView.jsx        History with day/week/month views
+    GermanComparison.jsx   Germany comparison with badges
+```
+
+## Version History
+
+| Version | Changes |
 |---|---|
-| 1.0.0 | Dashboard, To-Do, Habits, Workout, Schlaf, Ziele, Notizen |
-| 1.1.0 | Edit-Buttons, Deutschland-Vergleich |
-| 1.2.0 | Smart Home Panel, Cloud Panel |
-| 1.3.0 | Budget erweitert, Wetter, Szenen, System Monitor |
-| 1.3.1 | Security Setup, Release Script |
-| 1.4.0 | Reward System mit Coins und Raengen |
-| 1.5.0 | Penalty System, Rueckfall-Meldung, README |
+| 1.0.0 | Dashboard, to-dos, habits, workout, sleep, goals, notes |
+| 1.1.0 | Edit buttons, Germany comparison |
+| 1.2.0 | Smart home panel, cloud panel |
+| 1.3.0 | Extended budget, weather, scenes, system monitor |
+| 1.3.1 | Security setup, release script |
+| 1.4.0 | Reward system with coins and ranks |
+| 1.5.0 | Penalty system, relapse reporting, documentation |
 
-## Lizenz
+## License
 
-Privates Projekt von Jonas Kresse.
+Private project by Jonas Kresse.
