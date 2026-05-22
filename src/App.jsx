@@ -12,6 +12,8 @@ import TrainingPlan from './components/TrainingPlan'
 import BudgetTracker from './components/BudgetTracker'
 import HistoryView from './components/HistoryView'
 import GermanComparison from './components/GermanComparison'
+import SmartHomePanel from './components/SmartHomePanel'
+import CloudPanel from './components/CloudPanel'
 
 const STORAGE_KEY = 'dashboard_data'
 
@@ -47,6 +49,52 @@ const defaultData = {
     debtPayments: [],
   },
   sleepGoal: 8,
+  smarthome: {
+    rooms: [
+      { id: 1, name: 'Wohnzimmer', temp: 21.5, targetTemp: 22, humidity: 45, lights: [{ id: 1, name: 'Deckenlampe', on: true, brightness: 80 }, { id: 2, name: 'Stehlampe', on: false, brightness: 50 }] },
+      { id: 2, name: 'Schlafzimmer', temp: 19.2, targetTemp: 19, humidity: 52, lights: [{ id: 3, name: 'Nachttisch', on: true, brightness: 30 }] },
+      { id: 3, name: 'Küche', temp: 22.1, targetTemp: 22, humidity: 38, lights: [{ id: 4, name: 'Küchenlampe', on: true, brightness: 100 }] },
+      { id: 4, name: 'Bad', temp: 23.0, targetTemp: 23, humidity: 65, lights: [{ id: 5, name: 'Spiegellampe', on: false, brightness: 100 }] },
+    ],
+    energy: {
+      stromDaily: [3.2, 4.1, 3.8, 3.5, 4.3, 3.9, 3.6, 4.0, 3.7, 3.3, 4.2, 3.8, 3.4, 3.9, 4.1, 3.6, 3.5, 4.0, 3.8, 3.7, 3.4, 3.9, 4.1, 3.6, 3.3, 4.2, 3.8, 3.5, 3.7, 3.9],
+      gasDaily: [2.1, 2.5, 2.3, 1.9, 2.6, 2.2, 2.0, 2.4, 2.1, 1.8, 2.5, 2.3, 2.0, 2.4, 2.6, 2.1, 2.0, 2.3, 2.2, 2.1, 1.9, 2.4, 2.5, 2.0, 1.8, 2.6, 2.3, 2.1, 2.2, 2.4],
+      stromMonthly: [98, 105, 95, 88, 92, 85, 82, 88, 95, 102, 110, 108],
+      gasMonthly: [120, 115, 85, 55, 30, 15, 10, 12, 25, 60, 95, 118],
+      stromPrice: 0.35,
+      gasPrice: 0.12,
+      devices: [
+        { id: 1, name: 'PC & Monitor', watts: 350, hoursPerDay: 6 },
+        { id: 2, name: 'Kühlschrank', watts: 100, hoursPerDay: 24 },
+        { id: 3, name: 'Waschmaschine', watts: 500, hoursPerDay: 0.5 },
+        { id: 4, name: 'Raspberry Pi', watts: 15, hoursPerDay: 24 },
+      ],
+    },
+  },
+  cloud: {
+    totalGB: 4000,
+    usedGB: 856,
+    folders: [
+      { name: 'Dokumente', sizeGB: 124, color: 'var(--purple)' },
+      { name: 'Fotos', sizeGB: 380, color: 'var(--blue)' },
+      { name: 'Videos', sizeGB: 215, color: 'var(--coral)' },
+      { name: 'Musik', sizeGB: 67, color: 'var(--teal)' },
+      { name: 'Backups', sizeGB: 45, color: 'var(--amber)' },
+      { name: 'Sonstiges', sizeGB: 25, color: 'var(--text-muted)' },
+    ],
+    recentFiles: [
+      { name: 'Präsentation_Q2.pptx', size: '4.2 MB', date: '21.05.2026', type: 'doc' },
+      { name: 'Urlaub_2026.jpg', size: '12.8 MB', date: '20.05.2026', type: 'img' },
+      { name: 'Budget_Mai.xlsx', size: '1.1 MB', date: '19.05.2026', type: 'doc' },
+      { name: 'Podcast_EP42.mp3', size: '85 MB', date: '18.05.2026', type: 'audio' },
+      { name: 'Pi_Backup_20260517.tar.gz', size: '2.3 GB', date: '17.05.2026', type: 'backup' },
+    ],
+    connectedDevices: [
+      { name: 'Jonas PC', status: 'online', lastSync: 'Gerade eben' },
+      { name: 'iPhone', status: 'online', lastSync: 'Vor 5 Min' },
+      { name: 'Tablet', status: 'offline', lastSync: 'Vor 2 Tagen' },
+    ],
+  },
 }
 
 function loadData() {
@@ -78,32 +126,34 @@ function App() {
     { id: 'dashboard', label: 'Dashboard', icon: '◉' },
     { id: 'training', label: 'Training', icon: '◎' },
     { id: 'budget', label: 'Budget', icon: '◈' },
+    { id: 'smarthome', label: 'Smart Home', icon: '◆' },
+    { id: 'cloud', label: 'Cloud', icon: '◇' },
     { id: 'history', label: 'Verlauf', icon: '◷' },
   ]
 
   return (
-    <div style={{ maxWidth: 900, margin: '0 auto', padding: '1.5rem 1rem 3rem' }}>
+    <div style={{ maxWidth: 960, margin: '0 auto', padding: '1.5rem 1rem 3rem' }}>
       <Header />
 
       <div style={{
-        display: 'flex', gap: 4, marginBottom: 18,
+        display: 'flex', gap: 3, marginBottom: 18,
         background: 'var(--bg-card)', borderRadius: 'var(--radius-md)',
-        padding: 4, border: '1px solid var(--border)',
+        padding: 4, border: '1px solid var(--border)', overflowX: 'auto',
       }}>
         {tabs.map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             style={{
-              flex: 1, padding: '10px 0', borderRadius: 'var(--radius-sm)',
-              border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 500,
-              fontFamily: 'var(--font-main)',
+              flex: 1, padding: '10px 4px', borderRadius: 'var(--radius-sm)',
+              border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 500,
+              fontFamily: 'var(--font-main)', whiteSpace: 'nowrap', minWidth: 0,
               background: activeTab === tab.id ? 'var(--purple-dim)' : 'transparent',
               color: activeTab === tab.id ? '#fff' : 'var(--text-secondary)',
               transition: 'all 0.2s',
             }}
           >
-            <span style={{ marginRight: 6 }}>{tab.icon}</span>
+            <span style={{ marginRight: 4 }}>{tab.icon}</span>
             {tab.label}
           </button>
         ))}
@@ -131,20 +181,20 @@ function App() {
       )}
 
       {activeTab === 'training' && (
-        <TrainingPlan
-          plan={data.trainingPlan}
-          setPlan={v => update('trainingPlan', v)}
-          log={data.trainingLog}
-          setLog={v => update('trainingLog', v)}
-          today={today}
-        />
+        <TrainingPlan plan={data.trainingPlan} setPlan={v => update('trainingPlan', v)}
+          log={data.trainingLog} setLog={v => update('trainingLog', v)} today={today} />
       )}
 
       {activeTab === 'budget' && (
-        <BudgetTracker
-          budget={data.budget}
-          setBudget={v => update('budget', v)}
-        />
+        <BudgetTracker budget={data.budget} setBudget={v => update('budget', v)} />
+      )}
+
+      {activeTab === 'smarthome' && (
+        <SmartHomePanel smarthome={data.smarthome} setSmarthome={v => update('smarthome', v)} />
+      )}
+
+      {activeTab === 'cloud' && (
+        <CloudPanel cloud={data.cloud} />
       )}
 
       {activeTab === 'history' && (
