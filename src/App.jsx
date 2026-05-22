@@ -17,6 +17,7 @@ import SmartHomePanel from './components/SmartHomePanel'
 import { WeatherWidget, SceneControl, AutomationLog, DEFAULT_SCENES } from './components/SmartHomeExtended'
 import CloudPanel from './components/CloudPanel'
 import SystemPanel from './components/SystemPanel'
+import RewardSystem from './components/RewardSystem'
 
 const STORAGE_KEY = 'dashboard_data'
 const WEEKDAYS = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag']
@@ -104,6 +105,16 @@ const defaultData = {
       { name: 'Tablet', status: 'offline', lastSync: 'Vor 2 Tagen' },
     ],
   },
+  rewards: {
+    items: [
+      { id: 1, name: 'Neues Spiel kaufen', cost: 500, emoji: '🎮' },
+      { id: 2, name: 'Cheat Day', cost: 200, emoji: '🍕' },
+      { id: 3, name: 'Kino-Abend', cost: 150, emoji: '🎬' },
+      { id: 4, name: 'Neue Kopfhörer', cost: 1000, emoji: '🎧' },
+      { id: 5, name: 'Hobby-Equipment', cost: 750, emoji: '🛹' },
+    ],
+    redeemed: [],
+  },
 }
 
 function loadData() {
@@ -130,6 +141,7 @@ function App() {
     { id: 'dashboard', label: 'Dashboard', icon: '◉' },
     { id: 'training', label: 'Training', icon: '◎' },
     { id: 'budget', label: 'Budget', icon: '◈' },
+    { id: 'rewards', label: 'Rewards', icon: '★' },
     { id: 'smarthome', label: 'Smart Home', icon: '◆' },
     { id: 'cloud', label: 'Cloud', icon: '◇' },
     { id: 'system', label: 'System', icon: '⬡' },
@@ -196,6 +208,10 @@ function App() {
             <SparChallenge challenge={data.sparChallenge} setChallenge={v => update('sparChallenge', v)} />
           </div>
         </>
+      )}
+
+      {activeTab === 'rewards' && (
+        <RewardSystem data={data} rewards={data.rewards} setRewards={v => update('rewards', v)} today={today} />
       )}
 
       {activeTab === 'smarthome' && (
