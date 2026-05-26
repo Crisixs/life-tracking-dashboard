@@ -50,3 +50,41 @@ input, button, select, textarea {
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 3px; }
+
+/* --- RESPONSIVE DESIGN ERGÄNZUNGEN --- */
+
+/* Für Tablets und Smartphones (Bildschirme kleiner als 800px) */
+@media (max-width: 800px) {
+  /* Zwingt alle 2-Spalten-Grids in App.jsx zu einer einzigen, sauberen Spalte untereinander */
+  div[style*="gridTemplateColumns: '1fr 1fr'"],
+  div[style*="grid-template-columns: 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Macht die Navigation scrollbar, falls die Buttons nicht nebeneinander passen */
+  div[style*="overflowX: 'auto'"],
+  div[style*="overflow-x: auto"] {
+    display: flex !important;
+    justify-content: flex-start !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Gibt den Navigations-Buttons auf dem Handy etwas mehr Platz zum Tippen mit dem Finger */
+  button[style*="font-size: 11"] {
+    font-size: 13px !important;
+    padding: 12px 8px !important;
+    min-width: 100px !important;
+  }
+}
+
+/* Für sehr kleine Smartphones (Bildschirme kleiner als 480px) */
+@media (max-width: 480px) {
+  body {
+    padding: 0.5rem !important; /* Weniger Rand am Displayrand */
+  }
+  
+  /* Widgets erhalten volle Breite */
+  div {
+    font-size: 14px; 
+  }
+}
