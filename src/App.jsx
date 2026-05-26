@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react'
 import './index.css'
 import Header from './components/Header'
+import LoginScreen from './components/LoginScreen'
+import { useAuth } from './contexts/AuthContext'
+import { api } from './api'
 import StatsRow from './components/StatsRow'
 import TodoList from './components/TodoList'
 import HabitTracker from './components/HabitTracker'
@@ -22,7 +25,6 @@ import Countdowns from './components/Countdowns'
 import WeeklyReflection from './components/WeeklyReflection'
 import SettingsPanel from './components/SettingsPanel'
 
-const STORAGE_KEY = 'dashboard_data'
 const WEEKDAYS = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag']
 
 const defaultData = {
@@ -124,19 +126,36 @@ const defaultData = {
   reflections: {},
 }
 
-function loadData() {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved) { return { ...defaultData, ...JSON.parse(saved) } }
-  } catch (e) {}
-  return defaultData
-}
-
 function App() {
-  const [data, setData] = useState(loadData)
+  const { user, logout } = useAuth()
+  const [data, setData] = useState(defaultData)
+  const [loadedUserId, setLoadedUserId] = useState(null)
   const [activeTab, setActiveTab] = useState('dashboard')
 
-  useEffect(() => { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)) }, [data])
+  const dataLoaded = !!user && loadedUserId === user.id
+
+  // Load user data from API after login
+  useEffect(() => {
+    if (!user) return
+    api.getData()
+      .then(({ data: apiData }) => {
+        setData({ ...defaultData, ...apiData })
+        setLoadedUserId(user.id)
+      })
+      .catch(() => {
+        setData(defaultData)
+        setLoadedUserId(user.id)
+      })
+  }, [user])
+
+  // Debounced save to API (1.5s after last change)
+  useEffect(() => {
+    if (!user || !dataLoaded) return
+    const timer = setTimeout(() => {
+      api.saveData(data).catch(console.error)
+    }, 1500)
+    return () => clearTimeout(timer)
+  }, [data, user, dataLoaded])
 
   const update = (key, value) => {
     setData(prev => ({ ...prev, [key]: typeof value === 'function' ? value(prev[key]) : value }))
@@ -157,9 +176,43 @@ function App() {
     { id: 'settings', label: 'Settings', icon: '◎' },
   ]
 
+  if (!user) return <LoginScreen />
+
+  if (!dataLoaded) return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)' }}>
+      <div style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
+        <div style={{ fontSize: 32, marginBottom: 12, color: 'var(--purple)' }}>◉</div>
+        <p style={{ margin: 0, fontFamily: 'var(--font-main)' }}>Daten werden geladen…</p>
+      </div>
+    </div>
+  )
+
   return (
     <div style={{ maxWidth: 960, margin: '0 auto', padding: '1.5rem 1rem 3rem' }}>
-      <Header />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+        <Header />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+          <span style={{ fontSize: 12, color: 'var(--text-muted)', fontFamily: 'var(--font-main)' }}>
+            @{user.username}
+          </span>
+          <button
+            onClick={logout}
+            title="Abmelden"
+            style={{
+              padding: '5px 10px',
+              background: 'transparent',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius-sm)',
+              color: 'var(--text-muted)',
+              fontSize: 11,
+              cursor: 'pointer',
+              fontFamily: 'var(--font-main)',
+            }}
+          >
+            Abmelden
+          </button>
+        </div>
+      </div>
 
       <div style={{
         display: 'flex', gap: 3, marginBottom: 18,

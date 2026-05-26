@@ -39,3 +39,9 @@ Desktop.ini
 
 # Build artifacts
 releases/
+
+# Database & user data (sensitive!)
+data/
+*.db
+*.db-shm
+*.db-wal
